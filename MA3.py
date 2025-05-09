@@ -45,6 +45,7 @@ def approximate_pi(n): # Ex1
     plt.savefig(str(n) + " points")
     volume = 4*(sum/n)
     print(volume, n, sum)
+    #dean
 
 
 
@@ -102,13 +103,13 @@ def sphere_volume_parallel2(n,d,np=10):
 
 
     def sphere_volume(n, d): #Ex2, approximation
-        def inCircle(a):
+        def modulus(a):
             sum = 0
             for i in a:
                 sum += i**2
             return m.sqrt(sum)
         listList = [[2*random.random()-1 for i in range(d)] for i in range(int(n))]
-        sumList = list(map(inCircle, listList))
+        sumList = list(map(modulus, listList))
         f = lambda x : x < 1
         insides = list(filter(f, sumList))
         sum = len(insides)
