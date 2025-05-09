@@ -93,7 +93,7 @@ def sphere_volume_parallel1(n,d,np=10):
 
     return mean(results)
 #Ex4: parallel code - parallelize actual computations by splitting data
-def sphere_volume_parallel2(n,d,np=10):
+def sphere_volume_parallel3(n,d,np=10):
     #n is the number of points
     # d is the number of dimensions of the sphere
     #np is the number of processes
@@ -121,9 +121,47 @@ def sphere_volume_parallel2(n,d,np=10):
         volume = (2**d)*(sumPointsInside/n)
 
     return volume
+
+def sphere_volume_parallel2(n,d,np=10):
+    
+    def modulus(a):
+        sum = 0
+        for i in a:
+            sum += i**2
+        return m.sqrt(sum)
+            
+    
+    def randomPointGen(d, n):
+        return [[2*random.random()-1 for i in range(d)] for i in range(n)]
+
+
+    with future.ThreadPoolExecutor() as ex:
+        runners = [ex.submit(randomPointGen, d, int(n/np)) for i in range(np)]
+        
+        randList = []
+        for i in runners:
+            randList = randList + i.result()
+        
+        chunkSize = m.ceil(n/np)
+        modlist= list(map(modulus, randList))
+        p_list = [modlist[i:i + chunkSize] for i in range(0, len(modlist), chunkSize)]
+        
+        f = lambda x : x < 1
+        insides = []
+        runners = [ex.submit(filter, f, p_list[i]) for i in range(np)]
+        for i in runners:
+            insides = insides + list(i.result())
+        volume = (2**d)*(len(insides)/n)
+
+
+
+    return volume
     
 def main():
     #Ex1
+    
+
+    
     approximate_pi(10)
     dots = [1000, 10000, 100000]
     for n in dots:
